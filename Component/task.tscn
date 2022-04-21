@@ -24,6 +24,9 @@ func _ready():
 
 func set_name(new_name):
 	$\"Task Name\".text = new_name
+	
+func setup_task(obj):
+	$ProgressBar.max_value = obj['difficulty']
 
 func updat_hero_list(_hero_list):
 	hero_list=_hero_list
@@ -32,7 +35,11 @@ func updat_hero_list(_hero_list):
 	update_heros_list_in_menu_button($MenuButton3)
 	update_heros_list_in_menu_button($MenuButton4)
 	
-	
+func update_hero_personal_progress():
+	for item in [$MenuButton, $MenuButton2, $MenuButton3, $MenuButton4]:
+		if menuButtonSelected[item] != null:
+			menuButtonSelected[item].update_progres($ProgressBar.value)
+
 func update_heros_list_in_menu_button(t_button):
 	t_button.get_popup().clear()
 	t_button.get_popup().add_item('unassigned')
@@ -101,11 +108,6 @@ func _get_job_progress(t_button):
 	if menuButtonSelected[t_button] != null:
 		return menuButtonSelected[t_button].get_hero_job_progres()
 	return 0
-
-func update_hero_personal_progress():
-	for item in [$MenuButton, $MenuButton2, $MenuButton3, $MenuButton4]:
-		if menuButtonSelected[item] != null:
-			menuButtonSelected[item].update_progres($ProgressBar.value)
 			
 func _on_task_completed():
 	emit_signal(\"task_done\",$\"Task Name\".text)

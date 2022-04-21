@@ -24,10 +24,10 @@ func _ready():
 	job_tab.connect(\"hero_selected_to_task\",self,'_hero_selected')
 	
 	exploration_tab.create_task_group('Recruitment')
-	exploration_tab.add_task_to('Recruitment','Recrute Adventurer')
+	exploration_tab.add_task_to('Recruitment','Recrute Adventurer',{'difficulty':200})
 	
 	job_tab.create_task_group('Odd job')
-	job_tab.add_task_to('Odd job','Job #1')
+	job_tab.add_task_to('Odd job','Job #1',{'difficulty':100})
 
 func _on_add_new_hero(hero_obj):
 	emit_signal(\"add_new_hero\", hero_obj)

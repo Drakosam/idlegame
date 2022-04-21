@@ -27,8 +27,8 @@ func propagate_hero_selected_to_task(obj):
 func _hero_selected(obj):
 	emit_signal(\"hero_selected_to_task\", obj)
 	
-func add_task_to(group_name ,task_name):
-	taskGroupStore[group_name].add_task(task_name)
+func add_task_to(group_name ,task_name, obj):
+	taskGroupStore[group_name].add_task(task_name, obj)
 
 func create_task_group(group_name):
 	var new_group = TaskGroupClass.instance()
@@ -40,7 +40,7 @@ func create_task_group(group_name):
 	taskGroupList.append(new_group)
 	$ScrollContainer/VBoxContainer.add_child(new_group)
 	
-func _task_done(task_grop_name,task_name):
+func _task_done(task_grop_name, task_name):
 	emit_signal(\"task_done\", task_grop_name, task_name)
 	
 

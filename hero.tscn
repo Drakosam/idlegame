@@ -81,7 +81,7 @@ func _get_random_name():
 	'Żelazny', 'Łysy', 'Cudaczny', 'Wygnaniec', 'Kropidło', 'Wysoki', 'Plątonogi', 'Brodaty', 
 	'Pobożny', 'Prawy', 'Śmiały', 'Dumny', 'Zuchwały', 'Mocny', 'Lew', 'Niedźwiedź', 'Żelazny', 
 	'Surowy', 'Srogi', 'Groźny', 'Spokojny', 'Wesoły', 'Milczek', 'Cichy','Starszy', 'Średni', 
-	'Młody', 'Młodszy', 'Dziecię', 'Stary,Jąkały', 'Trędowatego', 'Ślepego', 'Szalonego', 
+	'Młody', 'Młodszy', 'Dziecię', 'Stary','Jąkały', 'Trędowatego', 'Ślepego', 'Szalonego', 
 	'Dziwaka', 'Zły', 'Leniwy', 'Gnuśny', 'Próżniak','Pyszny', 'Kłótnik', 'Diabeł', 'Okrutny',
 	'Zwyrodniały', 'Straszliwy', 'Krótkim', 'Pryszczatym', 'Tłustym', 'Garbatym', 'Krzywym', 
 	'Kulawym', 'Łokietkiem', 'Długi', 'Słońce', 'Wspaniały', 'Dostojny', 'Cnotliwy', 

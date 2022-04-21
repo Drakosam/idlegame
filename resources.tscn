@@ -3,7 +3,7 @@
 [sub_resource type="GDScript" id=1]
 script/source = "extends Panel
 
-var resources = 0
+var resources = 15
 
 func _ready():
 	update_resourrce(7)

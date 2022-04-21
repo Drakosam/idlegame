@@ -20,12 +20,13 @@ func propagate_hero_selected_to_task(obj):
 	for item in tasks_List:
 		item.propagate_hero_selected_to_task(obj)
 
-func add_task(task_name=''):
+func add_task(task_name, obj):
 	var new_task = TaskClass.instance()
 	new_task.updat_hero_list(hero_list_copy)
 	new_task.connect(\"hero_selected_to_task\",self,'_hero_selected')
 	new_task.connect(\"task_done\",self,'_task_dobe')
 	new_task.set_name(task_name)
+	new_task.setup_task(obj)
 	tasks_List.append(new_task)
 	self.add_child(new_task)
 
