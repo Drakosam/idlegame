@@ -1,0 +1,60 @@
+[gd_scene load_steps=2 format=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends VBoxContainer
+
+var tasks_List = []
+var hero_list_copy = []
+const TaskClass = preload(\"res://Component/task.tscn\")
+
+signal hero_selected_to_task(obj)
+signal task_done(task_group, task_name)
+
+func _ready():
+	pass
+
+func set_name(new_name):
+	$Button.text = new_name
+
+func propagate_hero_selected_to_task(obj):
+	for item in tasks_List:
+		item.propagate_hero_selected_to_task(obj)
+
+func add_task(task_name=''):
+	var new_task = TaskClass.instance()
+	new_task.updat_hero_list(hero_list_copy)
+	new_task.connect(\"hero_selected_to_task\",self,'_hero_selected')
+	new_task.connect(\"task_done\",self,'_task_dobe')
+	new_task.set_name(task_name)
+	tasks_List.append(new_task)
+	self.add_child(new_task)
+
+func updat_hero_list(hero_list):
+	hero_list_copy = hero_list
+	for item in tasks_List:
+		item.updat_hero_list(hero_list)
+
+func _on_button_up():
+	for item in tasks_List:
+		item.visible = !item.visible
+
+func _hero_selected(obj):
+	emit_signal(\"hero_selected_to_task\",obj)
+
+func _task_dobe(task_name):
+	emit_signal(\"task_done\",$Button.text, task_name)
+"
+
+[node name="TaskGroup" type="VBoxContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_vertical = 3
+script = SubResource( 1 )
+
+[node name="Button" type="Button" parent="."]
+margin_right = 1024.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 0, 40 )
+text = "Task Group Name"
+
+[connection signal="button_up" from="Button" to="." method="_on_button_up"]

@@ -1,0 +1,45 @@
+[gd_scene load_steps=2 format=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Panel
+
+const NewHeroClass = preload(\"res://hero.tscn\")
+var hero_list = []
+
+func _ready():
+	pass # Replace with function body.
+
+func add_new_hero(new_hero_obj):
+	var new_hero = NewHeroClass.instance()
+	new_hero.setup(new_hero_obj)
+	new_hero.set_id(hero_list.size())
+	hero_list.append(new_hero)
+	$ScrollContainer/VBoxContainer.add_child(new_hero)
+
+func get_heros_list():
+	return hero_list
+"
+
+[node name="HeroList" type="Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = SubResource( 1 )
+
+[node name="ColorRect" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0.129412, 0, 0, 1 )
+
+[node name="VSeparator" type="VSeparator" parent="."]
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -2.0
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ScrollContainer"]
+margin_right = 1024.0
+size_flags_horizontal = 3

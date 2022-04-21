@@ -1,0 +1,65 @@
+[gd_scene load_steps=2 format=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Panel
+
+var resources = 0
+
+func _ready():
+	update_resourrce(7)
+
+func update_resourrce(_new_resources):
+	var dif = 0
+	resources += _new_resources
+	if resources <0:
+		dif = abs(resources)
+		resources = 0
+		
+	$Resource_value.text = str(resources)
+	return dif
+
+
+"
+
+[node name="ResourrceTab" type="Panel"]
+anchor_right = 1.0
+margin_bottom = 60.0
+script = SubResource( 1 )
+
+[node name="HSeparator" type="HSeparator" parent="."]
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = -2.0
+margin_bottom = 2.0
+
+[node name="VSeparator" type="VSeparator" parent="."]
+anchor_bottom = 1.0
+margin_right = 4.0
+
+[node name="VSeparator2" type="VSeparator" parent="."]
+anchor_bottom = 1.0
+margin_left = 150.0
+margin_right = 154.0
+
+[node name="HSeparator2" type="HSeparator" parent="."]
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+margin_top = -2.0
+margin_bottom = 2.0
+
+[node name="Resource" type="Label" parent="."]
+anchor_bottom = 0.5
+margin_right = 150.0
+text = "Resource"
+align = 1
+valign = 1
+
+[node name="Resource_value" type="Label" parent="."]
+anchor_top = 0.5
+anchor_bottom = 1.0
+margin_right = 150.0
+text = "0"
+align = 1
+valign = 1

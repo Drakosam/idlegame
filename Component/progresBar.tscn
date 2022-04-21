@@ -1,0 +1,60 @@
+[gd_scene load_steps=2 format=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Panel
+
+var text = ''
+var show_proc = false
+
+func _ready():
+	pass # Replace with function body.
+
+
+func set_up_progres(_text, _show_pronc, _max_value):
+	text = _text
+	show_proc = _show_pronc
+	$ProgressBar.max_value = _max_value
+	_update_label()
+	
+	
+func update_max_value(_max_value):
+	$ProgressBar.max_value = _max_value
+	_update_label()
+
+
+func update_progres_value(_value):
+	$ProgressBar.value = _value
+	_update_label()
+
+
+func _update_label():
+	var mv = $ProgressBar.max_value
+	var cv = $ProgressBar.value
+	var txt = ''
+	
+	if show_proc:
+		var pv = int(cv/mv*100) 
+		txt = '{txt} {pv}%'.format({'txt':text,'pv':pv})
+	else:
+		txt = '{txt} {cv}\\\\{mv}'.format({'txt':text,'mv':mv,'cv':cv})
+	
+	$Label.text = txt
+	
+"
+
+[node name="CustomProgresBar" type="Panel"]
+anchor_right = 1.0
+margin_bottom = 60.0
+script = SubResource( 1 )
+
+[node name="ProgressBar" type="ProgressBar" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+percent_visible = false
+
+[node name="Label" type="Label" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 1
+align = 1
+valign = 1

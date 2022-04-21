@@ -1,0 +1,108 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://heroPanel.tscn" type="PackedScene" id=1]
+[ext_resource path="res://taskTab.tscn" type="PackedScene" id=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Panel
+
+var rng = RandomNumberGenerator.new()
+
+signal add_new_hero(hero_obj)
+signal update_resources(_new_resources)
+
+var hero_list_copy = []
+
+var exploration_tab = null
+var job_tab = null
+
+func _ready():
+	exploration_tab = $TabContainer/Exploration/ExplorationTab
+	job_tab = $TabContainer/Job/JobTab
+	
+	exploration_tab.connect(\"hero_selected_to_task\",self,'_hero_selected')
+	job_tab.connect(\"hero_selected_to_task\",self,'_hero_selected')
+	
+	exploration_tab.create_task_group('Recruitment')
+	exploration_tab.add_task_to('Recruitment','Recrute Adventurer')
+	
+	job_tab.create_task_group('Odd job')
+	job_tab.add_task_to('Odd job','Job #1')
+
+func _on_add_new_hero(hero_obj):
+	emit_signal(\"add_new_hero\", hero_obj)
+
+func updat_hero_list(hero_list):
+	hero_list_copy = hero_list
+	exploration_tab.updat_hero_list(hero_list)
+	job_tab.updat_hero_list(hero_list)
+	
+func _on_hero_selected_to_task(obj):
+	exploration_tab.propagate_hero_selected_to_task(obj)
+	job_tab.propagate_hero_selected_to_task(obj)
+
+
+func _on_JobTab_task_done(task_grop_name, task_name):
+	if task_grop_name == 'Odd job':
+		rng.randomize()
+		var _new_resources = rng.randi_range(3,7)
+		emit_signal(\"update_resources\",_new_resources)
+
+
+func _on_ExplorationTab_task_done(task_grop_name, task_name):
+	if task_grop_name == 'Recruitment':
+		if task_name == 'Recrute Adventurer':
+			_on_add_new_hero({'random':true})
+"
+
+[node name="World" type="Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = SubResource( 1 )
+
+[node name="ColorRect" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0.129412, 0, 0, 1 )
+
+[node name="TabContainer" type="TabContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+tab_align = 0
+
+[node name="Job" type="Tabs" parent="TabContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 32.0
+margin_right = -4.0
+margin_bottom = -4.0
+
+[node name="JobTab" parent="TabContainer/Job" instance=ExtResource( 2 )]
+
+[node name="Exploration" type="Tabs" parent="TabContainer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 32.0
+margin_right = -4.0
+margin_bottom = -4.0
+
+[node name="ExplorationTab" parent="TabContainer/Exploration" instance=ExtResource( 2 )]
+
+[node name="Hero" type="Tabs" parent="TabContainer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 32.0
+margin_right = -4.0
+margin_bottom = -4.0
+
+[node name="HeroPanel" parent="TabContainer/Hero" instance=ExtResource( 1 )]
+
+[connection signal="hero_selected_to_task" from="TabContainer/Job/JobTab" to="." method="_on_hero_selected_to_task"]
+[connection signal="task_done" from="TabContainer/Job/JobTab" to="." method="_on_JobTab_task_done"]
+[connection signal="hero_selected_to_task" from="TabContainer/Exploration/ExplorationTab" to="." method="_on_hero_selected_to_task"]
+[connection signal="task_done" from="TabContainer/Exploration/ExplorationTab" to="." method="_on_ExplorationTab_task_done"]

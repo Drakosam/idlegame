@@ -1,0 +1,63 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://heroList.tscn" type="PackedScene" id=1]
+[ext_resource path="res://resources.tscn" type="PackedScene" id=2]
+[ext_resource path="res://world.tscn" type="PackedScene" id=3]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node2D
+
+var hero_list_tab = null
+var resources_tab = null
+
+func _ready():
+	hero_list_tab = $CanvasLayer/HeroList
+	resources_tab = $CanvasLayer/Resources
+	
+	hero_list_tab.add_new_hero({'random':true})
+	hero_list_tab.add_new_hero({'random':true})
+	hero_list_tab.add_new_hero({'random':true})
+	$CanvasLayer/World.updat_hero_list(hero_list_tab.get_heros_list())
+
+func _on_add_new_hero(hero_obj):
+	hero_list_tab.add_new_hero(hero_obj)
+	$CanvasLayer/World.updat_hero_list(hero_list_tab.get_heros_list())
+
+func _on_update_resources(_new_resources):
+	resources_tab.update_resourrce(_new_resources)
+
+func _on_Consumption_cycle_timeout():
+	for hero in hero_list_tab.get_heros_list():
+		hero.progres_consuption()
+		if hero.need_be_paid:
+			var payment = hero.get_paid_value()
+			var dif = resources_tab.update_resourrce(payment*(-1))
+			hero.hero_get_paid(dif)
+			hero.need_be_paid = false
+	
+"
+
+[node name="Game" type="Node2D"]
+script = SubResource( 1 )
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="HeroList" parent="CanvasLayer" instance=ExtResource( 1 )]
+anchor_right = 0.0
+margin_right = 300.0
+
+[node name="Resources" parent="CanvasLayer" instance=ExtResource( 2 )]
+margin_left = 300.0
+margin_bottom = 50.0
+
+[node name="World" parent="CanvasLayer" instance=ExtResource( 3 )]
+margin_left = 300.0
+margin_top = 50.0
+
+[node name="Consumption_cycle" type="Timer" parent="."]
+wait_time = 0.25
+autostart = true
+
+[connection signal="add_new_hero" from="CanvasLayer/World" to="." method="_on_add_new_hero"]
+[connection signal="update_resources" from="CanvasLayer/World" to="." method="_on_update_resources"]
+[connection signal="timeout" from="Consumption_cycle" to="." method="_on_Consumption_cycle_timeout"]

@@ -1,0 +1,198 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Component/progresBar.tscn" type="PackedScene" id=1]
+
+[sub_resource type="Theme" id=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Panel
+
+var rng = RandomNumberGenerator.new()
+var mause_in = false
+var hero_id = -1
+var hero_lvl = 1
+var consuption_progres = 0
+var consuption_progres_max = 240
+var morale_max = 100
+var morale = 100
+var need_be_paid = false
+
+func _ready():
+	$JobProgress.set_up_progres('Job', true, 200)
+	$Exp.set_up_progres('Exp', false, 100)
+	$Consuption.set_up_progres('Consuption', true, consuption_progres_max)
+	$Helth.set_up_progres('Helth', false, 10)
+	$Morale.set_up_progres('Morale', true, morale_max)
+	
+	$Morale.update_progres_value(morale)
+	
+func setup(new_hero_obj):
+	$Profesion_Value.text = 'Adv'
+	if new_hero_obj['random']:
+		$Name_Value.text = _get_random_name()
+	else:
+		$Name_Value.text = new_hero_obj['name']
+
+func progres_consuption():
+	consuption_progres += 1
+	if consuption_progres > consuption_progres_max:
+		need_be_paid = true
+		consuption_progres = 0
+	$Consuption.update_progres_value(consuption_progres)
+	
+func get_paid_value():
+	return 5 * hero_lvl
+	
+func hero_get_paid(dif):
+	var demand_value = get_paid_value()
+	if dif == 0:
+		update_morale(10)
+	else:
+		var morale_dmg = int( float(dif)/float(demand_value) *20)*(-1)
+		update_morale(morale_dmg)
+
+func update_morale(_morale):
+	morale += _morale
+	if morale > morale_max:
+		morale = morale_max
+	elif morale < 0:
+		morale = 0
+	$Morale.update_progres_value(morale)
+	
+
+func get_name():
+	return $Name_Value.text
+
+func set_id(_id):
+	hero_id = _id
+
+func get_hero_job_progres():
+	return hero_lvl
+	
+func assigned_job(max_lvl, current_lvl):
+	$JobProgress.update_max_value(max_lvl)
+	$JobProgress.update_progres_value(current_lvl)
+
+func update_progres(current_lvl):
+	$JobProgress.update_progres_value(current_lvl)
+
+func _get_random_name():
+	var names_list = ['Laskonogi','Gruby', 'Otyły', 'Zwinny', 'Garbaty', 'Rozrzutny', 'Wierny', 
+	'Żelazny', 'Łysy', 'Cudaczny', 'Wygnaniec', 'Kropidło', 'Wysoki', 'Plątonogi', 'Brodaty', 
+	'Pobożny', 'Prawy', 'Śmiały', 'Dumny', 'Zuchwały', 'Mocny', 'Lew', 'Niedźwiedź', 'Żelazny', 
+	'Surowy', 'Srogi', 'Groźny', 'Spokojny', 'Wesoły', 'Milczek', 'Cichy','Starszy', 'Średni', 
+	'Młody', 'Młodszy', 'Dziecię', 'Stary,Jąkały', 'Trędowatego', 'Ślepego', 'Szalonego', 
+	'Dziwaka', 'Zły', 'Leniwy', 'Gnuśny', 'Próżniak','Pyszny', 'Kłótnik', 'Diabeł', 'Okrutny',
+	'Zwyrodniały', 'Straszliwy', 'Krótkim', 'Pryszczatym', 'Tłustym', 'Garbatym', 'Krzywym', 
+	'Kulawym', 'Łokietkiem', 'Długi', 'Słońce', 'Wspaniały', 'Dostojny', 'Cnotliwy', 
+	'Sprawiedliwy', 'Prawy', 'Dobry', 'Szlachetny', 'Wielkoduszny', 'Niezłomny', 'Łagodny',
+	 'Łaskawy', 'Szczodry']
+	rng.randomize()
+	var pick = rng.randi_range(0,names_list.size())
+	return names_list[pick]
+	
+func _input(event):
+	if event is InputEventMouseButton:
+		if event.button_index == BUTTON_LEFT and event.pressed and mause_in:
+			print($Name_Value.text)
+
+func _on_mouse_entered():
+	mause_in = true
+
+func _on_mouse_exited():
+	mause_in = false
+"
+
+[node name="Heros" type="Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+rect_min_size = Vector2( 0, 165 )
+theme = SubResource( 2 )
+script = SubResource( 1 )
+
+[node name="HSeparator" type="HSeparator" parent="."]
+anchor_right = 1.0
+margin_top = 30.0
+margin_bottom = 34.0
+rect_pivot_offset = Vector2( 125, 73 )
+
+[node name="HSeparator2" type="HSeparator" parent="."]
+anchor_right = 1.0
+margin_top = 60.0
+margin_bottom = 64.0
+
+[node name="VSeparator" type="VSeparator" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Name" type="Label" parent="."]
+anchor_right = 0.5
+margin_bottom = 30.0
+text = "Name ść"
+align = 1
+valign = 1
+
+[node name="Profesion" type="Label" parent="."]
+anchor_left = 0.5
+anchor_right = 1.0
+margin_bottom = 30.0
+text = "Profesion"
+align = 1
+valign = 1
+
+[node name="Name_Value" type="Label" parent="."]
+anchor_right = 0.5
+margin_top = 30.0
+margin_bottom = 60.0
+text = "ś"
+align = 1
+valign = 1
+
+[node name="Profesion_Value" type="Label" parent="."]
+anchor_left = 0.5
+anchor_right = 1.0
+margin_top = 30.0
+margin_bottom = 60.0
+align = 1
+valign = 1
+
+[node name="JobProgress" parent="." instance=ExtResource( 1 )]
+margin_top = 65.0
+margin_bottom = 85.0
+
+[node name="Exp" parent="." instance=ExtResource( 1 )]
+margin_top = 85.0
+margin_bottom = 105.0
+
+[node name="Consuption" parent="." instance=ExtResource( 1 )]
+margin_top = 105.0
+margin_bottom = 125.0
+
+[node name="Helth" parent="." instance=ExtResource( 1 )]
+margin_top = 125.0
+margin_bottom = 145.0
+
+[node name="Morale" parent="." instance=ExtResource( 1 )]
+margin_top = 145.0
+margin_bottom = 165.0
+
+[connection signal="mouse_entered" from="VSeparator" to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="VSeparator" to="." method="_on_mouse_exited"]
+[connection signal="mouse_entered" from="Name" to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="Name" to="." method="_on_mouse_exited"]
+[connection signal="mouse_entered" from="Profesion" to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="Profesion" to="." method="_on_mouse_exited"]
+[connection signal="mouse_entered" from="Name_Value" to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="Name_Value" to="." method="_on_mouse_exited"]
+[connection signal="mouse_entered" from="Profesion_Value" to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="Profesion_Value" to="." method="_on_mouse_exited"]
+[connection signal="mouse_entered" from="JobProgress" to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="JobProgress" to="." method="_on_mouse_exited"]
+[connection signal="mouse_entered" from="Exp" to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="Exp" to="." method="_on_mouse_exited"]
+[connection signal="mouse_entered" from="Consuption" to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="Consuption" to="." method="_on_mouse_exited"]
+[connection signal="mouse_entered" from="Helth" to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="Helth" to="." method="_on_mouse_exited"]
+[connection signal="mouse_entered" from="Morale" to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="Morale" to="." method="_on_mouse_exited"]

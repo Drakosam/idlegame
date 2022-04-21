@@ -1,0 +1,179 @@
+[gd_scene load_steps=2 format=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Panel
+
+var hero_list = []
+var menuButtonSelected = {}
+
+signal hero_selected_to_task(obj)
+signal task_done(task_name)
+
+func _ready():
+	$ProgressBar.max_value = 100
+	
+	$MenuButton.get_popup().connect( 'id_pressed', self, '_on_pick_menu1')
+	$MenuButton2.get_popup().connect('id_pressed', self, '_on_pick_menu2')
+	$MenuButton3.get_popup().connect('id_pressed', self, '_on_pick_menu3')
+	$MenuButton4.get_popup().connect('id_pressed', self, '_on_pick_menu4')
+	
+	menuButtonSelected[$MenuButton]=null
+	menuButtonSelected[$MenuButton2]=null
+	menuButtonSelected[$MenuButton3]=null
+	menuButtonSelected[$MenuButton4]=null
+
+func set_name(new_name):
+	$\"Task Name\".text = new_name
+
+func updat_hero_list(_hero_list):
+	hero_list=_hero_list
+	update_heros_list_in_menu_button($MenuButton)
+	update_heros_list_in_menu_button($MenuButton2)
+	update_heros_list_in_menu_button($MenuButton3)
+	update_heros_list_in_menu_button($MenuButton4)
+	
+	
+func update_heros_list_in_menu_button(t_button):
+	t_button.get_popup().clear()
+	t_button.get_popup().add_item('unassigned')
+	
+	for hero in hero_list:
+		t_button.get_popup().add_item(hero.get_name())
+
+func propagate_hero_selected_to_task(obj):
+	_check_hero_assigned($MenuButton,obj)
+	_check_hero_assigned($MenuButton2,obj)
+	_check_hero_assigned($MenuButton3,obj)
+	_check_hero_assigned($MenuButton4,obj)
+	
+func _check_hero_assigned(t_button,obj):
+	if t_button == obj['parent']:
+		return
+	if menuButtonSelected[t_button] == obj['new_hero']:
+		menuButtonSelected[t_button] = null
+		t_button.text = 'unassigned'
+
+func _on_pick_menu1(id_pick):
+	_on_pick_hero(id_pick, $MenuButton)
+
+func _on_pick_menu2(id_pick):
+	_on_pick_hero(id_pick, $MenuButton2)
+
+func _on_pick_menu3(id_pick):
+	_on_pick_hero(id_pick, $MenuButton3)
+
+func _on_pick_menu4(id_pick):
+	_on_pick_hero(id_pick, $MenuButton4)
+
+func _on_pick_hero(id_pick,t_button):
+	if id_pick > 0:
+		var hero_pick = hero_list[id_pick - 1]
+		t_button.text = hero_pick.get_name()
+		var obj = {'new_hero':hero_pick,'parent':t_button}
+		if menuButtonSelected[t_button] != null:
+			menuButtonSelected[t_button].assigned_job(100, 0)
+		menuButtonSelected[t_button] = hero_pick
+		emit_signal(\"hero_selected_to_task\",obj)
+		hero_pick.assigned_job($ProgressBar.max_value,$ProgressBar.value)
+	else:
+		if menuButtonSelected[t_button] != null:
+			menuButtonSelected[t_button].assigned_job(100, 0)
+		menuButtonSelected[t_button] = null
+		t_button.text = 'unassigned'
+
+func _on_Timer_timeout():
+	var value = 0
+	value += _get_job_progress($MenuButton)
+	value += _get_job_progress($MenuButton2)
+	value += _get_job_progress($MenuButton3)
+	value += _get_job_progress($MenuButton4)
+	
+	if $ProgressBar.max_value < $ProgressBar.value + value:
+		var n_value = (value + $ProgressBar.value) - $ProgressBar.max_value
+		$ProgressBar.value = n_value
+		_on_task_completed()
+	else:
+		$ProgressBar.value += value
+	
+	update_hero_personal_progress()
+
+func _get_job_progress(t_button):
+	if menuButtonSelected[t_button] != null:
+		return menuButtonSelected[t_button].get_hero_job_progres()
+	return 0
+
+func update_hero_personal_progress():
+	for item in [$MenuButton, $MenuButton2, $MenuButton3, $MenuButton4]:
+		if menuButtonSelected[item] != null:
+			menuButtonSelected[item].update_progres($ProgressBar.value)
+			
+func _on_task_completed():
+	emit_signal(\"task_done\",$\"Task Name\".text)
+"
+
+[node name="Task" type="Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+rect_min_size = Vector2( 0, 135 )
+script = SubResource( 1 )
+
+[node name="Task Name" type="Label" parent="."]
+anchor_right = 1.0
+margin_bottom = 30.0
+text = "Task Name"
+align = 1
+valign = 1
+
+[node name="ProgressBar" type="ProgressBar" parent="."]
+anchor_right = 1.0
+margin_left = 10.0
+margin_top = 30.0
+margin_right = -10.0
+margin_bottom = 60.0
+
+[node name="MenuButton" type="MenuButton" parent="."]
+anchor_right = 0.5
+margin_left = 10.0
+margin_top = 65.0
+margin_right = -10.0
+margin_bottom = 95.0
+text = "unassigned"
+flat = false
+
+[node name="MenuButton2" type="MenuButton" parent="."]
+anchor_left = 0.5
+anchor_right = 1.0
+margin_left = 10.0
+margin_top = 65.0
+margin_right = -10.0
+margin_bottom = 95.0
+focus_mode = 2
+text = "unassigned"
+flat = false
+
+[node name="MenuButton3" type="MenuButton" parent="."]
+anchor_right = 0.5
+margin_left = 10.0
+margin_top = 100.0
+margin_right = -10.0
+margin_bottom = 130.0
+focus_mode = 2
+text = "unassigned"
+flat = false
+
+[node name="MenuButton4" type="MenuButton" parent="."]
+anchor_left = 0.5
+anchor_right = 1.0
+margin_left = 10.0
+margin_top = 100.0
+margin_right = -10.0
+margin_bottom = 130.0
+focus_mode = 2
+text = "unassigned"
+flat = false
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.5
+autostart = true
+
+[connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]

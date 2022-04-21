@@ -1,0 +1,60 @@
+[gd_scene load_steps=2 format=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Panel
+
+var taskGroupStore = {}
+var taskGroupList = []
+var hero_list_copy = []
+
+const TaskGroupClass = preload(\"res://Component/taskGroup.tscn\")
+
+signal hero_selected_to_task(obj)
+signal task_done(task_grop_name, task_name)
+
+func _ready():
+	pass
+
+func updat_hero_list(hero_list):
+	hero_list_copy = hero_list
+	for item in taskGroupList:
+		item.updat_hero_list(hero_list)
+	
+func propagate_hero_selected_to_task(obj):
+	for item in taskGroupList:
+		item.propagate_hero_selected_to_task(obj)
+
+func _hero_selected(obj):
+	emit_signal(\"hero_selected_to_task\", obj)
+	
+func add_task_to(group_name ,task_name):
+	taskGroupStore[group_name].add_task(task_name)
+
+func create_task_group(group_name):
+	var new_group = TaskGroupClass.instance()
+	new_group.set_name(group_name)
+	new_group.connect(\"hero_selected_to_task\",self,'_hero_selected')
+	new_group.connect(\"task_done\",self,\"_task_done\")
+	new_group.updat_hero_list(hero_list_copy)
+	taskGroupStore[group_name] = new_group
+	taskGroupList.append(new_group)
+	$ScrollContainer/VBoxContainer.add_child(new_group)
+	
+func _task_done(task_grop_name,task_name):
+	emit_signal(\"task_done\", task_grop_name, task_name)
+	
+
+"
+
+[node name="JobTab" type="Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = SubResource( 1 )
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ScrollContainer"]
+margin_right = 1024.0
+size_flags_horizontal = 3
